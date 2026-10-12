@@ -97,7 +97,8 @@
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 20px;
   }
-  .empty { color: var(--sub); text-align: center; padding: 20px 0; }
+  .empty { color: var(--sub); text-align: center; padding: 20px 0; grid-column: 1 / -1; }
+  .jump-gen { color: var(--accent); font-weight: 700; }
   .card {
     background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
     padding: 20px; display: flex; flex-direction: column; gap: 12px;
@@ -320,7 +321,7 @@
   <section class="step">
     <div class="step-title"><span class="step-num">1</span>冷蔵庫にある食材を入力</div>
     <textarea id="ingredients" placeholder="例）&#10;豚肉&#10;キャベツ&#10;たまご, 玉ねぎ, にんじん"></textarea>
-    <p class="hint">1行に1つ、またはカンマ（,、）区切りで入力。内容はブラウザに自動保存されます。</p>
+    <p class="hint">改行で1行に1つずつ入力すればOK（カンマ「,」「、」で区切っても使えます）。カタカナ・ひらがなはどちらでも大丈夫。内容はブラウザに自動保存されます。</p>
     <div class="notice" id="notice">🥕 食材がまだ入力されていません。冷蔵庫の中身を書いてみてください！</div>
   </section>
 
@@ -336,7 +337,7 @@
   <section class="step result-step">
     <div class="step-title"><span class="step-num">3</span>今日のおすすめ献立</div>
     <div class="grid" id="result">
-      <p class="empty">食材を入れてボタンを押すと、ここに献立が並びます。</p>
+      <p class="empty">①に食材を入れて、②の<a href="#" class="jump-gen">「🍳 今日の献立5品を出す！」ボタン</a>を押すと、ここに献立が並びます。</p>
     </div>
   </section>
 
@@ -627,6 +628,8 @@ function updateGenBtn() {
   renderGenrePick($genGenre, genGenre);
   const label = genGenre === "すべて" ? "献立" : genGenre;
   $btn.textContent = `🍳 今日の${label}${SHOW_COUNT}品を出す！`;
+  const jump = document.querySelector(".jump-gen"); // ③の案内文のボタン名も合わせる
+  if (jump) jump.textContent = `「${$btn.textContent}」ボタン`;
 }
 updateGenBtn();
 
@@ -706,6 +709,14 @@ function render(list, noMatch) {
 }
 
 $btn.addEventListener("click", generate);
+
+// 案内文のリンク：②のボタンまでスクロールして目立たせる
+document.querySelector(".jump-gen").addEventListener("click", e => {
+  e.preventDefault();
+  $btn.scrollIntoView({ behavior: "smooth", block: "center" });
+  $btn.animate([{ transform: "scale(1)" }, { transform: "scale(1.06)" }, { transform: "scale(1)" }],
+    { duration: 500, iterations: 2, delay: 400 });
+});
 
 // 選んだ料理だけカロリーを合計する
 let currentList = [];
